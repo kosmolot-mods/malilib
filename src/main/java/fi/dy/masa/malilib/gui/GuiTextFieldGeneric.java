@@ -3,7 +3,6 @@ package fi.dy.masa.malilib.gui;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 
 public class GuiTextFieldGeneric extends TextFieldWidget
@@ -52,12 +51,12 @@ public class GuiTextFieldGeneric extends TextFieldWidget
         return this.y;
     }
 
-    public void method_46421(int x)
+    public void setX(int x)
     {
         this.x = x;
     }
 
-    public void method_46419(int y)
+    public void setY(int y)
     {
         this.y = y;
     }

@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.malilib.gui.GuiScrollBar;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.MaLiLibIcons;
@@ -77,8 +76,8 @@ public class WidgetDropDownList<T> extends WidgetBase
     {
         super.setPosition(x, y);
 
-        this.searchBar.getTextField().method_46421(x + 1);
-        this.searchBar.getTextField().method_46419(y - 18);
+        this.searchBar.getTextField().setX(x + 1);
+        this.searchBar.getTextField().setY(y - 18);
     }
 
     protected int getRequiredWidth(int width, List<T> entries, MinecraftClient mc)
