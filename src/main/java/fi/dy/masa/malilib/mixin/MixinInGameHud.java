@@ -1,5 +1,6 @@
 package fi.dy.masa.malilib.mixin;
 
+import net.minecraft.client.gui.DrawContext;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,8 +18,8 @@ public abstract class MixinInGameHud
     @Shadow @Final private MinecraftClient client;
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void onGameOverlayPost(MatrixStack matrixStack, float partialTicks, CallbackInfo ci)
+    private void onGameOverlayPost(DrawContext drawContext, float partialTicks, CallbackInfo ci)
     {
-        ((RenderEventHandler) RenderEventHandler.getInstance()).onRenderGameOverlayPost(matrixStack, this.client, partialTicks);
+        ((RenderEventHandler) RenderEventHandler.getInstance()).onRenderGameOverlayPost(drawContext, this.client, partialTicks);
     }
 }

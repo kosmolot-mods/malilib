@@ -1,8 +1,8 @@
 package fi.dy.masa.malilib.gui;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 
 public class GuiTextFieldGeneric extends TextFieldWidget
@@ -29,6 +29,7 @@ public class GuiTextFieldGeneric extends TextFieldWidget
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
         boolean ret = super.mouseClicked(mouseX, mouseY, mouseButton);
+        setFocused(ret);
 
         if (mouseButton == 1 && this.isMouseOver((int) mouseX, (int) mouseY))
         {
@@ -100,20 +101,20 @@ public class GuiTextFieldGeneric extends TextFieldWidget
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float partialTicks)
     {
         if (this.zLevel != 0)
         {
-            matrixStack.push();
-            matrixStack.translate(0, 0, this.zLevel);
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(0, 0, this.zLevel);
 
-            super.render(matrixStack, mouseX, mouseY, partialTicks);
+            super.render(drawContext, mouseX, mouseY, partialTicks);
 
-            matrixStack.pop();
+            drawContext.getMatrices().pop();
         }
         else
         {
-            super.render(matrixStack, mouseX, mouseY, partialTicks);
+            super.render(drawContext, mouseX, mouseY, partialTicks);
         }
     }
 }

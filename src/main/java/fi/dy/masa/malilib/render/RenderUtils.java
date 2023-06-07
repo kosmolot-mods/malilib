@@ -14,7 +14,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
@@ -212,7 +212,7 @@ public class RenderUtils
         buffer.vertex(x        , y         , zLevel).texture( u          * pixelWidth,  v           * pixelWidth).next();
     }
 
-    public static void drawHoverText(int x, int y, List<String> textLines, MatrixStack matrixStack)
+    public static void drawHoverText(int x, int y, List<String> textLines, DrawContext drawContext)
     {
         MinecraftClient mc = mc();
 
@@ -253,8 +253,8 @@ public class RenderUtils
                 textStartX = Math.max(2, maxWidth - maxLineLength - 8);
             }
 
-            matrixStack.push();
-            matrixStack.translate(0, 0, 300);
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(0, 0, 300);
             RenderSystem.applyModelViewMatrix();
 
             double zLevel = 300;
@@ -275,11 +275,11 @@ public class RenderUtils
             for (int i = 0; i < textLines.size(); ++i)
             {
                 String str = textLines.get(i);
-                font.drawWithShadow(matrixStack, str, textStartX, textStartY, 0xFFFFFFFF);
+                drawContext.drawTextWithShadow(font, str, textStartX, textStartY, 0xFFFFFFFF);
                 textStartY += lineHeight;
             }
 
-            matrixStack.pop();
+            drawContext.getMatrices().pop();
             RenderSystem.applyModelViewMatrix();
 
             //RenderSystem.enableDepthTest();
@@ -317,10 +317,10 @@ public class RenderUtils
         RenderSystem.disableBlend();
     }
 
-    public static void drawCenteredString(int x, int y, int color, String text, MatrixStack matrixStack)
+    public static void drawCenteredString(int x, int y, int color, String text, DrawContext drawContext)
     {
         TextRenderer textRenderer = mc().textRenderer;
-        textRenderer.drawWithShadow(matrixStack, text, x - textRenderer.getWidth(text) / 2, y, color);
+        drawContext.drawTextWithShadow(textRenderer, text, x - textRenderer.getWidth(text) / 2, y, color);
     }
 
     public static void drawHorizontalLine(int x, int y, int width, int color)
@@ -333,28 +333,28 @@ public class RenderUtils
         drawRect(x, y, 1, height, color);
     }
 
-    public static void renderSprite(int x, int y, int width, int height, Identifier atlas, Identifier texture, MatrixStack matrixStack)
+    public static void renderSprite(int x, int y, int width, int height, Identifier atlas, Identifier texture, DrawContext drawContext)
     {
         if (texture != null)
         {
             Sprite sprite = mc().getSpriteAtlas(atlas).apply(texture);
-            DrawableHelper.drawSprite(matrixStack, x, y, 0, width, height, sprite);//.drawTexturedRect(x, y, sprite, width, height);
+            drawContext.drawSprite(x, y, 0, width, height, sprite);
         }
     }
 
-    public static void renderText(int x, int y, int color, String text, MatrixStack matrixStack)
+    public static void renderText(int x, int y, int color, String text, DrawContext drawContext)
     {
         String[] parts = text.split("\\\\n");
         TextRenderer textRenderer = mc().textRenderer;
 
         for (String line : parts)
         {
-            textRenderer.drawWithShadow(matrixStack, line, x, y, color);
+            drawContext.drawTextWithShadow(textRenderer, line, x, y, color);
             y += textRenderer.fontHeight + 1;
         }
     }
 
-    public static void renderText(int x, int y, int color, List<String> lines, MatrixStack matrixStack)
+    public static void renderText(int x, int y, int color, List<String> lines, DrawContext drawContext)
     {
         if (lines.isEmpty() == false)
         {
@@ -362,7 +362,7 @@ public class RenderUtils
 
             for (String line : lines)
             {
-                textRenderer.draw(matrixStack, line, x, y, color);
+                drawContext.drawText(textRenderer, line, x, y, color, false);
                 y += textRenderer.fontHeight + 2;
             }
         }
@@ -370,7 +370,7 @@ public class RenderUtils
 
     public static int renderText(int xOff, int yOff, double scale, int textColor, int bgColor,
             HudAlignment alignment, boolean useBackground, boolean useShadow, List<String> lines,
-            MatrixStack matrixStack)
+            DrawContext drawContext)
     {
         TextRenderer fontRenderer = mc().textRenderer;
         final int scaledWidth = GuiUtils.getScaledWindowWidth();
@@ -433,11 +433,11 @@ public class RenderUtils
 
             if (useShadow)
             {
-                fontRenderer.drawWithShadow(matrixStack, line, x, y, textColor);
+                drawContext.drawTextWithShadow(fontRenderer, line, x, y, textColor);
             }
             else
             {
-                fontRenderer.draw(matrixStack, line, x, y, textColor);
+                drawContext.drawText(fontRenderer, line, x, y, textColor, false);
             }
         }
 
@@ -1076,7 +1076,7 @@ public class RenderUtils
         }
     }
 
-    public static void renderShulkerBoxPreview(ItemStack stack, int baseX, int baseY, boolean useBgColors)
+    public static void renderShulkerBoxPreview(ItemStack stack, int baseX, int baseY, boolean useBgColors, DrawContext drawContext)
     {
         if (stack.hasNbt())
         {
@@ -1106,18 +1106,24 @@ public class RenderUtils
             }
 
             disableDiffuseLighting();
+
             MatrixStack matrixStack = RenderSystem.getModelViewStack();
             matrixStack.push();
             matrixStack.translate(0, 0, 500);
             RenderSystem.applyModelViewMatrix();
 
-            InventoryOverlay.renderInventoryBackground(type, x, y, props.slotsPerRow, items.size(), mc());
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(0, 0, 100);
+
+
+            InventoryOverlay.renderInventoryBackground(type, x, y, props.slotsPerRow, items.size(), mc(), drawContext);
 
             enableDiffuseLightingGui3D();
 
             Inventory inv = fi.dy.masa.malilib.util.InventoryUtils.getAsInventory(items);
-            InventoryOverlay.renderInventoryStacks(type, inv, x + props.slotOffsetX, y + props.slotOffsetY, props.slotsPerRow, 0, -1, mc());
+            InventoryOverlay.renderInventoryStacks(type, inv, x + props.slotOffsetX, y + props.slotOffsetY, props.slotsPerRow, 0, -1, mc(), drawContext);
 
+            drawContext.getMatrices().pop();
             matrixStack.pop();
             RenderSystem.applyModelViewMatrix();
         }
