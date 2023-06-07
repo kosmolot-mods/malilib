@@ -3,6 +3,8 @@ package fi.dy.masa.malilib.gui.widgets;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.DrawContext;
+import fi.dy.masa.malilib.config.IConfigColorList;
+import fi.dy.masa.malilib.gui.button.ConfigButtonColorList;
 import net.minecraft.client.gui.screen.Screen;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.IConfigBase;
@@ -161,6 +163,11 @@ public class WidgetConfigOption extends WidgetConfigOptionBase<ConfigOptionWrapp
         else if (type == ConfigType.STRING_LIST)
         {
             ConfigButtonStringList optionButton = new ConfigButtonStringList(x, y, configWidth, configHeight, (IConfigStringList) config, this.host, this.host.getDialogHandler());
+            this.addConfigButtonEntry(x + configWidth + 2, y, (IConfigResettable) config, optionButton);
+        }
+        else if (type == ConfigType.COLOR_LIST)
+        {
+            ConfigButtonColorList optionButton = new ConfigButtonColorList(x, y, configWidth, configHeight, (IConfigColorList) config, this.host, this.host.getDialogHandler());
             this.addConfigButtonEntry(x + configWidth + 2, y, (IConfigResettable) config, optionButton);
         }
         else if (type == ConfigType.HOTKEY)
